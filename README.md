@@ -1,0 +1,1 @@
+Mundo Móvil Catálogo V2. Adaptado al BrandBook oficial. Próximo paso: productos reales, Google Sheets, WhatsApp y publicación en GitHub Pages.
