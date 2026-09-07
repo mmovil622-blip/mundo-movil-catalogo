@@ -1,7 +1,48 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mundo Móvil | Catálogo</title><link rel="stylesheet" href="styles.css"></head><body>
-<header><img src="assets/logo-claro.png"><a href="https://wa.me/" target="_blank">WhatsApp</a></header>
-<main><section class="hero"><div><b>TODO PARA TU CELU EN UN SOLO LUGAR</b><h1>La tecnología,<br><em>a tu alcance.</em></h1><p>Celulares, accesorios y soluciones simples, sin vueltas. Consultá stock, precios y opciones de pago.</p></div><aside><img src="assets/isotipo-azul.png"><small>SERVICIO TÉCNICO</small><h2>¿Tu celu necesita una mano?</h2><p>Reparaciones multimarca · iPhone · Android</p><button onclick="alert('En el próximo paso conectamos tu WhatsApp real')">Cotizar reparación</button></aside></section>
-<nav id="cats"></nav><section class="filters"><input id="q" placeholder="Buscar producto, marca o modelo..."><select id="brand"><option value="">Todas las marcas</option></select></section>
-<div class="head"><div><b>PRODUCTOS</b><h2>Catálogo Mundo Móvil</h2></div><span id="count"></span></div><section id="grid" class="grid"></section>
-<section class="service"><div><b>SERVICIO TÉCNICO</b><h2>Arreglamos tu celu rápido y bien.</h2><p>Módulos, baterías, pines de carga, equipos que no encienden y más.</p></div><div><b>VENTAS</b><h2>¿Buscás algo específico?</h2><p>Escribinos y te ayudamos a encontrar el modelo, color o accesorio que necesitás.</p></div></section></main>
-<footer><img src="assets/logo-azul.png"><div><strong>Todo en un mismo lugar.</strong><span>Instagram: @mundomovilcelulares</span></div></footer><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#112C71">
+  <title>Mundo Móvil | Catálogo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <img src="assets/logo-claro.png" alt="Mundo Móvil">
+  <a href="#catalogo">Ver catálogo</a>
+</header>
+<main>
+  <section class="hero">
+    <div><b>TODO PARA TU CELU EN UN SOLO LUGAR</b><h1>La tecnología,<br><em>a tu alcance.</em></h1><p>Celulares, accesorios y soluciones simples, sin vueltas. Consultá precios y opciones de pago.</p></div>
+    <aside><img src="assets/isotipo-azul.png" alt="Mundo Móvil"><small>SERVICIO TÉCNICO</small><h2>¿Tu celu necesita una mano?</h2><p>Reparaciones multimarca · iPhone · Android</p><button onclick="alert('Después conectamos este botón al WhatsApp real de Mundo Móvil')">Cotizar reparación</button></aside>
+  </section>
+
+  <section id="catalogo">
+    <nav id="cats"></nav>
+    <section class="filters"><input id="q" placeholder="Buscar producto, marca o modelo..."><select id="brand"><option value="">Todas las marcas</option></select></section>
+    <div class="head"><div><b>PRODUCTOS</b><h2>Catálogo Mundo Móvil</h2></div><span id="count"></span></div>
+    <section id="grid" class="grid"></section>
+  </section>
+
+  <section class="service"><div><b>SERVICIO TÉCNICO</b><h2>Arreglamos tu celu rápido y bien.</h2><p>Módulos, baterías, pines de carga, equipos que no encienden y más.</p></div><div><b>VENTAS</b><h2>¿Buscás algo específico?</h2><p>Escribinos y te ayudamos a encontrar el modelo, color o accesorio que necesitás.</p></div></section>
+</main>
+<footer><img src="assets/logo-azul.png" alt="Mundo Móvil"><div><strong>Todo en un mismo lugar.</strong><span>Instagram: @mundomovilcelulares</span></div></footer>
+
+<div id="productModal" class="modal" aria-hidden="true">
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" onclick="closeModal()" aria-label="Cerrar">×</button>
+    <div class="modal-product">
+      <div class="modal-visual"><img id="modalImage" alt="Producto"></div>
+      <div class="modal-info"><small id="modalBrand"></small><h2 id="modalTitle"></h2><p id="modalSpecs"></p><span class="availability">● Disponible para reservar</span></div>
+    </div>
+    <div class="modal-section"><div class="section-title"><span>1</span><div><h3>Elegí cómo pagar</h3><p>Seleccioná la opción que preferís.</p></div></div><div id="paymentOptions" class="choices"></div></div>
+    <div class="modal-section"><div class="section-title"><span>2</span><div><h3>¿Cuándo querés retirarlo?</h3><p>La reserva queda sujeta a confirmación por WhatsApp.</p></div></div><div id="pickupOptions" class="choices"></div></div>
+    <button id="whatsappContinue" class="whatsapp-continue" onclick="continueWhatsApp()" disabled>Elegí cuándo retirarlo</button>
+    <div id="messagePreviewWrap" class="message-preview" hidden><b>Vista previa del mensaje</b><pre id="messagePreview"></pre><small>Cuando nos pases el número de WhatsApp de Mundo Móvil, este botón abrirá el chat directamente.</small></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
