@@ -171,3 +171,121 @@ q.oninput = brand.oninput = render;
 modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
 render();
+
+// ===== Formulario universal de Servicio Técnico =====
+const serviceState = { step:1, device:'', brand:'', model:'', unknownModel:false, issue:'', details:'' };
+const serviceModal = document.querySelector('#serviceModal');
+
+function openServiceForm(){
+  resetServiceForm();
+  serviceModal.classList.add('show');
+  serviceModal.setAttribute('aria-hidden','false');
+  document.body.classList.add('modal-open');
+}
+
+function closeServiceForm(){
+  serviceModal.classList.remove('show');
+  serviceModal.setAttribute('aria-hidden','true');
+  document.body.classList.remove('modal-open');
+}
+
+function resetServiceForm(){
+  Object.assign(serviceState,{step:1,device:'',brand:'',model:'',unknownModel:false,issue:'',details:''});
+  document.querySelectorAll('#serviceModal .selected').forEach(el=>el.classList.remove('selected'));
+  document.querySelector('#serviceModel').value='';
+  document.querySelector('#unknownModel').checked=false;
+  document.querySelector('#serviceDetails').value='';
+  clearServiceError();
+  goServiceStep(1);
+}
+
+function goServiceStep(n){
+  serviceState.step=n;
+  document.querySelectorAll('[data-service-step]').forEach(el=>el.classList.toggle('active',Number(el.dataset.serviceStep)===n));
+  document.querySelectorAll('[data-step-dot]').forEach(el=>{
+    const v=Number(el.dataset.stepDot);
+    el.classList.toggle('active',v===n);
+    el.classList.toggle('done',v<n);
+  });
+  clearServiceError();
+  if(n===4) renderServiceSummary();
+  const panel=document.querySelector('.service-panel');
+  if(panel) panel.scrollTop=0;
+}
+
+function servicePrev(){ goServiceStep(Math.max(1,serviceState.step-1)); }
+
+function serviceNext(){
+  clearServiceError();
+  if(serviceState.step===2){
+    serviceState.model=document.querySelector('#serviceModel').value.trim();
+    serviceState.unknownModel=document.querySelector('#unknownModel').checked;
+    if(!serviceState.brand){ return serviceError('Elegí una marca para continuar.'); }
+    if(!serviceState.unknownModel && !serviceState.model){ return serviceError('Escribí el modelo o marcá “No sé qué modelo es”.'); }
+  }
+  if(serviceState.step===3){
+    serviceState.details=document.querySelector('#serviceDetails').value.trim();
+    if(!serviceState.issue){ return serviceError('Elegí el problema principal del equipo.'); }
+  }
+  goServiceStep(Math.min(4,serviceState.step+1));
+}
+
+function serviceError(text){
+  clearServiceError();
+  const step=document.querySelector(`[data-service-step="${serviceState.step}"]`);
+  const el=document.createElement('div'); el.className='form-error'; el.id='serviceError'; el.textContent=text; step.appendChild(el);
+}
+function clearServiceError(){ const el=document.querySelector('#serviceError'); if(el) el.remove(); }
+
+document.querySelectorAll('#deviceChoices .service-choice-card').forEach(btn=>btn.addEventListener('click',()=>{
+  serviceState.device=btn.dataset.value;
+  document.querySelectorAll('#deviceChoices .service-choice-card').forEach(x=>x.classList.toggle('selected',x===btn));
+  setTimeout(()=>goServiceStep(2),120);
+}));
+
+document.querySelectorAll('#serviceBrandChoices button').forEach(btn=>btn.addEventListener('click',()=>{
+  serviceState.brand=btn.dataset.value;
+  document.querySelectorAll('#serviceBrandChoices button').forEach(x=>x.classList.toggle('selected',x===btn));
+  clearServiceError();
+}));
+
+document.querySelector('#unknownModel').addEventListener('change',e=>{
+  const input=document.querySelector('#serviceModel');
+  input.disabled=e.target.checked;
+  if(e.target.checked) input.value='';
+  input.placeholder=e.target.checked?'No hace falta completar el modelo':'Ej.: iPhone 11, Galaxy A17, Moto G15...';
+});
+
+document.querySelectorAll('#issueChoices button').forEach(btn=>btn.addEventListener('click',()=>{
+  serviceState.issue=btn.dataset.value;
+  document.querySelectorAll('#issueChoices button').forEach(x=>x.classList.toggle('selected',x===btn));
+  clearServiceError();
+}));
+
+function renderServiceSummary(){
+  serviceState.model=document.querySelector('#serviceModel').value.trim();
+  serviceState.unknownModel=document.querySelector('#unknownModel').checked;
+  serviceState.details=document.querySelector('#serviceDetails').value.trim();
+  const model=serviceState.unknownModel?'No sabe el modelo':(serviceState.model||'Sin especificar');
+  const details=serviceState.details||'Sin detalles adicionales';
+  document.querySelector('#serviceSummary').innerHTML=`
+    <div class="service-summary-row"><span>Equipo</span><b>${escapeHTML(serviceState.device)}</b></div>
+    <div class="service-summary-row"><span>Marca</span><b>${escapeHTML(serviceState.brand)}</b></div>
+    <div class="service-summary-row"><span>Modelo</span><b>${escapeHTML(model)}</b></div>
+    <div class="service-summary-row"><span>Problema</span><b>${escapeHTML(serviceState.issue)}</b></div>
+    <div class="service-summary-row"><span>Detalle</span><b>${escapeHTML(details)}</b></div>`;
+}
+
+function escapeHTML(str){ return String(str).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+
+function sendServiceWhatsApp(){
+  const model=serviceState.unknownModel?'No sé qué modelo es':(serviceState.model||'Sin especificar');
+  const detail=serviceState.details||'Sin detalle adicional';
+  const message=`Hola Mundo Móvil 👋\nQuiero solicitar una cotización de reparación.\n\n📦 Equipo: ${serviceState.device}\n🏷️ Marca: ${serviceState.brand}\n📱 Modelo: ${model}\n🔧 Problema: ${serviceState.issue}\n📝 Detalle: ${detail}\n\nQuedo a la espera del presupuesto.`;
+  openWhatsApp(message);
+}
+
+if(serviceModal){
+  serviceModal.addEventListener('click',e=>{ if(e.target===serviceModal) closeServiceForm(); });
+}
+document.addEventListener('keydown',e=>{ if(e.key==='Escape' && serviceModal?.classList.contains('show')) closeServiceForm(); });

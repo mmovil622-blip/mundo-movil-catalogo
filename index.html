@@ -15,7 +15,7 @@
 <main>
   <section class="hero">
     <div><b>TODO PARA TU CELU EN UN SOLO LUGAR</b><h1>La tecnología,<br><em>a tu alcance.</em></h1><p>Celulares, accesorios y soluciones simples, sin vueltas. Consultá precios y opciones de pago.</p></div>
-    <aside><img src="assets/isotipo-azul.png" alt="Mundo Móvil"><small>SERVICIO TÉCNICO</small><h2>¿Tu celu necesita una mano?</h2><p>Reparaciones multimarca · iPhone · Android</p><button onclick="repairWhatsApp()">Cotizar reparación</button></aside>
+    <aside><img src="assets/isotipo-azul.png" alt="Mundo Móvil"><small>SERVICIO TÉCNICO</small><h2>¿Tu celu necesita una mano?</h2><p>Reparaciones multimarca · iPhone · Android</p><button onclick="openServiceForm()">Cotizar reparación</button></aside>
   </section>
 
   <section id="catalogo">
@@ -25,7 +25,7 @@
     <section id="grid" class="grid"></section>
   </section>
 
-  <section class="service"><div><b>SERVICIO TÉCNICO</b><h2>Arreglamos tu celu rápido y bien.</h2><p>Módulos, baterías, pines de carga, equipos que no encienden y más.</p><button onclick="repairWhatsApp()">Consultar reparación</button></div><div><b>VENTAS</b><h2>¿Buscás algo específico?</h2><p>Escribinos y te ayudamos a encontrar el modelo, color o accesorio que necesitás.</p><button onclick="generalWhatsApp()">Consultar por WhatsApp</button></div></section>
+  <section class="service"><div><b>SERVICIO TÉCNICO</b><h2>Arreglamos tu celu rápido y bien.</h2><p>Módulos, baterías, pines de carga, equipos que no encienden y más.</p><button onclick="openServiceForm()">Cotizar reparación</button></div><div><b>VENTAS</b><h2>¿Buscás algo específico?</h2><p>Escribinos y te ayudamos a encontrar el modelo, color o accesorio que necesitás.</p><button onclick="generalWhatsApp()">Consultar por WhatsApp</button></div></section>
 </main>
 <footer><img src="assets/logo-azul.png" alt="Mundo Móvil"><div><strong>Todo en un mismo lugar.</strong><span>Instagram: @mundomovilcelulares</span></div></footer>
 <button class="floating-whatsapp" onclick="generalWhatsApp()" aria-label="Abrir WhatsApp">WhatsApp</button>
@@ -41,6 +41,95 @@
     <div class="modal-section"><div class="section-title"><span>2</span><div><h3>¿Cuándo querés retirarlo?</h3><p>La reserva queda sujeta a confirmación por WhatsApp.</p></div></div><div id="pickupOptions" class="choices"></div></div>
     <button id="whatsappContinue" class="whatsapp-continue" onclick="continueWhatsApp()" disabled>Elegí cuándo retirarlo</button>
     <div id="messagePreviewWrap" class="message-preview" hidden><b>Vista previa del mensaje</b><pre id="messagePreview"></pre><small>Al continuar, se abrirá el WhatsApp oficial de Mundo Móvil con tu selección.</small></div>
+  </div>
+</div>
+
+<div id="serviceModal" class="service-modal" aria-hidden="true">
+  <div class="service-panel" role="dialog" aria-modal="true" aria-labelledby="serviceTitle">
+    <button class="modal-close" onclick="closeServiceForm()" aria-label="Cerrar">×</button>
+    <div class="service-top">
+      <div>
+        <small>SERVICIO TÉCNICO</small>
+        <h2 id="serviceTitle">Contanos qué le pasa a tu equipo</h2>
+        <p>Son 4 pasos rápidos. Al final nos llega toda la información por WhatsApp y te respondemos con la cotización.</p>
+      </div>
+      <img src="assets/isotipo-azul.png" alt="Mundo Móvil">
+    </div>
+
+    <div class="service-progress" aria-label="Progreso del formulario">
+      <span class="active" data-step-dot="1"><b>1</b><em>Equipo</em></span>
+      <span data-step-dot="2"><b>2</b><em>Modelo</em></span>
+      <span data-step-dot="3"><b>3</b><em>Problema</em></span>
+      <span data-step-dot="4"><b>4</b><em>Enviar</em></span>
+    </div>
+
+    <div class="service-step active" data-service-step="1">
+      <h3>¿Qué equipo necesitás reparar?</h3>
+      <p class="step-help">Elegí una opción para continuar.</p>
+      <div class="service-card-grid" id="deviceChoices">
+        <button type="button" class="service-choice-card" data-value="Celular"><span>📱</span><b>Celular</b></button>
+        <button type="button" class="service-choice-card" data-value="Tablet"><span>▣</span><b>Tablet</b></button>
+        <button type="button" class="service-choice-card" data-value="Consola / Joystick"><span>🎮</span><b>Consola / Joystick</b></button>
+        <button type="button" class="service-choice-card" data-value="Smartwatch"><span>⌚</span><b>Smartwatch</b></button>
+        <button type="button" class="service-choice-card" data-value="Otro"><span>＋</span><b>Otro</b></button>
+      </div>
+    </div>
+
+    <div class="service-step" data-service-step="2">
+      <h3>¿Qué equipo es?</h3>
+      <p class="step-help">Con marca y modelo podemos cotizarte mucho más rápido.</p>
+      <label class="field-label">Marca</label>
+      <div class="brand-pills" id="serviceBrandChoices">
+        <button type="button" data-value="Apple">Apple</button>
+        <button type="button" data-value="Samsung">Samsung</button>
+        <button type="button" data-value="Motorola">Motorola</button>
+        <button type="button" data-value="Xiaomi">Xiaomi</button>
+        <button type="button" data-value="Otra">Otra</button>
+      </div>
+      <label class="field-label" for="serviceModel">Modelo</label>
+      <input id="serviceModel" class="service-input" list="iphoneModels" placeholder="Ej.: iPhone 11, Galaxy A17, Moto G15...">
+      <datalist id="iphoneModels">
+        <option value="iPhone X"><option value="iPhone XR"><option value="iPhone XS"><option value="iPhone 11"><option value="iPhone 11 Pro"><option value="iPhone 11 Pro Max">
+        <option value="iPhone 12"><option value="iPhone 12 mini"><option value="iPhone 12 Pro"><option value="iPhone 12 Pro Max"><option value="iPhone 13"><option value="iPhone 13 mini"><option value="iPhone 13 Pro"><option value="iPhone 13 Pro Max">
+        <option value="iPhone 14"><option value="iPhone 14 Plus"><option value="iPhone 14 Pro"><option value="iPhone 14 Pro Max"><option value="iPhone 15"><option value="iPhone 15 Plus"><option value="iPhone 15 Pro"><option value="iPhone 15 Pro Max">
+        <option value="iPhone 16"><option value="iPhone 16 Plus"><option value="iPhone 16 Pro"><option value="iPhone 16 Pro Max">
+      </datalist>
+      <label class="dont-know"><input type="checkbox" id="unknownModel"> No sé qué modelo es</label>
+      <div class="service-actions"><button type="button" class="secondary" onclick="servicePrev()">Atrás</button><button type="button" onclick="serviceNext()">Continuar</button></div>
+    </div>
+
+    <div class="service-step" data-service-step="3">
+      <h3>¿Qué problema tiene?</h3>
+      <p class="step-help">Elegí el que más se parece. Después podés agregar detalles.</p>
+      <div class="issue-grid" id="issueChoices">
+        <button type="button" data-value="Batería"><span>🔋</span><b>Batería</b></button>
+        <button type="button" data-value="Pantalla / módulo"><span>📱</span><b>Pantalla / módulo</b></button>
+        <button type="button" data-value="Cambio de glass"><span>✨</span><b>Cambio de glass</b></button>
+        <button type="button" data-value="Tapa trasera"><span>◫</span><b>Tapa trasera</b></button>
+        <button type="button" data-value="No carga / pin de carga"><span>🔌</span><b>No carga / pin</b></button>
+        <button type="button" data-value="Cámara"><span>📷</span><b>Cámara</b></button>
+        <button type="button" data-value="Audio / micrófono"><span>🔊</span><b>Audio / micrófono</b></button>
+        <button type="button" data-value="No enciende"><span>⚡</span><b>No enciende</b></button>
+        <button type="button" data-value="Equipo mojado"><span>💧</span><b>Se mojó</b></button>
+        <button type="button" data-value="Otro problema"><span>?</span><b>Otro problema</b></button>
+      </div>
+      <label class="field-label" for="serviceDetails">¿Querés agregar algún detalle? <span>Opcional</span></label>
+      <textarea id="serviceDetails" class="service-input service-textarea" placeholder="Ej.: la batería dura poco, se cayó, no reconoce el cargador..."></textarea>
+      <div class="service-actions"><button type="button" class="secondary" onclick="servicePrev()">Atrás</button><button type="button" onclick="serviceNext()">Ver resumen</button></div>
+    </div>
+
+    <div class="service-step" data-service-step="4">
+      <div class="summary-badge">LISTO PARA COTIZAR</div>
+      <h3>Revisá tu solicitud</h3>
+      <p class="step-help">Si está todo bien, mandanos la consulta y te respondemos por WhatsApp.</p>
+      <div class="service-summary" id="serviceSummary"></div>
+      <div class="service-note">
+        <b>¿Qué pasa después?</b>
+        <p>Un asesor revisa tu consulta, confirma disponibilidad y te pasa precio, tiempo estimado y garantía.</p>
+      </div>
+      <button type="button" class="service-whatsapp" onclick="sendServiceWhatsApp()">Continuar por WhatsApp</button>
+      <button type="button" class="edit-service" onclick="goServiceStep(1)">Modificar datos</button>
+    </div>
   </div>
 </div>
 
