@@ -173,7 +173,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
 render();
 
 // ===== Formulario universal de Servicio Técnico =====
-const serviceState = { step:1, device:'', brand:'', model:'', unknownModel:false, issue:'', details:'' };
+const serviceState = { step:1, name:'', device:'', brand:'', model:'', unknownModel:false, issue:'', details:'' };
 const serviceModal = document.querySelector('#serviceModal');
 
 function openServiceForm(){
@@ -190,8 +190,9 @@ function closeServiceForm(){
 }
 
 function resetServiceForm(){
-  Object.assign(serviceState,{step:1,device:'',brand:'',model:'',unknownModel:false,issue:'',details:''});
+  Object.assign(serviceState,{step:1,name:'',device:'',brand:'',model:'',unknownModel:false,issue:'',details:''});
   document.querySelectorAll('#serviceModal .selected').forEach(el=>el.classList.remove('selected'));
+  document.querySelector('#serviceName').value='';
   document.querySelector('#serviceModel').value='';
   document.querySelector('#unknownModel').checked=false;
   document.querySelector('#serviceDetails').value='';
@@ -238,6 +239,8 @@ function serviceError(text){
 function clearServiceError(){ const el=document.querySelector('#serviceError'); if(el) el.remove(); }
 
 document.querySelectorAll('#deviceChoices .service-choice-card').forEach(btn=>btn.addEventListener('click',()=>{
+  serviceState.name=document.querySelector('#serviceName').value.trim();
+  if(!serviceState.name){ return serviceError('Escribí tu nombre para continuar.'); }
   serviceState.device=btn.dataset.value;
   document.querySelectorAll('#deviceChoices .service-choice-card').forEach(x=>x.classList.toggle('selected',x===btn));
   setTimeout(()=>goServiceStep(2),120);
@@ -266,9 +269,11 @@ function renderServiceSummary(){
   serviceState.model=document.querySelector('#serviceModel').value.trim();
   serviceState.unknownModel=document.querySelector('#unknownModel').checked;
   serviceState.details=document.querySelector('#serviceDetails').value.trim();
+  serviceState.name=document.querySelector('#serviceName').value.trim();
   const model=serviceState.unknownModel?'No sabe el modelo':(serviceState.model||'Sin especificar');
   const details=serviceState.details||'Sin detalles adicionales';
   document.querySelector('#serviceSummary').innerHTML=`
+    <div class="service-summary-row"><span>Nombre</span><b>${escapeHTML(serviceState.name)}</b></div>
     <div class="service-summary-row"><span>Equipo</span><b>${escapeHTML(serviceState.device)}</b></div>
     <div class="service-summary-row"><span>Marca</span><b>${escapeHTML(serviceState.brand)}</b></div>
     <div class="service-summary-row"><span>Modelo</span><b>${escapeHTML(model)}</b></div>
@@ -281,7 +286,7 @@ function escapeHTML(str){ return String(str).replace(/[&<>'"]/g,c=>({'&':'&amp;'
 function sendServiceWhatsApp(){
   const model=serviceState.unknownModel?'No sé qué modelo es':(serviceState.model||'Sin especificar');
   const detail=serviceState.details||'Sin detalle adicional';
-  const message=`Hola Mundo Móvil 👋\nQuiero solicitar una cotización de reparación.\n\n📦 Equipo: ${serviceState.device}\n🏷️ Marca: ${serviceState.brand}\n📱 Modelo: ${model}\n🔧 Problema: ${serviceState.issue}\n📝 Detalle: ${detail}\n\nQuedo a la espera del presupuesto.`;
+  const message=`Hola Mundo Móvil 👋\nQuiero solicitar una cotización de reparación.\n\n👤 Nombre: ${serviceState.name}\n📦 Equipo: ${serviceState.device}\n🏷️ Marca: ${serviceState.brand}\n📱 Modelo: ${model}\n🔧 Problema: ${serviceState.issue}\n📝 Detalle: ${detail}\n\nQuedo a la espera del presupuesto.`;
   openWhatsApp(message);
 }
 
