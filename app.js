@@ -80,8 +80,8 @@ function otherAccessoryWhatsApp(){
 
 const adviceState = { looking:'', budget:'', priority:'' };
 const adviceData = {
-  looking:[['📱','Un celular'],['🎧','Un accesorio'],['🎁','Un regalo'],['🔄','Quiero cambiar mi celular'],['❓','Otra cosa']],
-  budget:['Hasta $200.000','$200.000–$400.000','$400.000–$700.000','Más de $700.000','Prefiero no indicar'],
+  looking:[['📱','Un celular'],['🎧','Un accesorio'],['🔧','Servicio técnico'],['🎁','Un regalo'],['🔄','Quiero cambiar mi celular'],['❓','Otra cosa']],
+  budget:['$1.000–$100.000','$100.000–$200.000','$200.000–$400.000','$400.000–$700.000','Más de $700.000','Prefiero no indicar'],
   priority:[['📸','Cámara'],['🔋','Batería'],['🎮','Rendimiento'],['💾','Memoria'],['💰','Precio'],['🤷','No sé, quiero que me recomienden']]
 };
 function openAdviceForm(){
