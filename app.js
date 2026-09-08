@@ -1,4 +1,4 @@
-const WHATSAPP_NUMBER = ''; // Más adelante ponemos el número real de Mundo Móvil, sin + ni espacios.
+const WHATSAPP_NUMBER = '5491144148821'; // WhatsApp oficial de Mundo Móvil, sin + ni espacios.
 
 const products = [
   {
@@ -41,6 +41,25 @@ const modal = document.querySelector('#productModal');
 const categories = ['Todos', ...new Set(products.map(p => p.category))];
 [...new Set(products.map(p => p.brand))].forEach(x => brand.innerHTML += `<option>${x}</option>`);
 
+
+function openWhatsApp(message){
+  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`,'_blank');
+}
+
+function generalWhatsApp(){
+  openWhatsApp('Hola Mundo Móvil 👋 Quiero hacer una consulta.');
+}
+
+function repairWhatsApp(){
+  openWhatsApp('Hola Mundo Móvil 👋 Quiero consultar por una reparación.');
+}
+
+function consultProduct(id){
+  const p = products.find(x => x.id===id);
+  if(!p) return;
+  openWhatsApp(`Hola Mundo Móvil 👋 Quiero consultar por ${p.name}.`);
+}
+
 function money(x){
   return new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(x);
 }
@@ -72,7 +91,7 @@ function cardTemplate(p){
        <div class="card-pay"><strong>${money(p.cash)}</strong><span>efectivo</span></div>
        <div class="card-installments">o ${p.installments.qty} cuotas de <b>${money(p.installments.amount)}</b></div>
        <button class="open-product" onclick="openProduct('${p.id}')">Ver opciones de compra</button>`
-    : `<div class="price">${money(p.cash)}</div><div class="stock">EN STOCK</div>`;
+    : `<div class="price">${money(p.cash)}</div><button class="open-product generic-whatsapp" onclick="event.stopPropagation(); consultProduct('${p.id}')">Consultar por WhatsApp</button>`;
   return `<article class="card ${p.featured?'featured-card':''}">
       <div class="pic">${visual}</div>
       <div class="body"><small>${p.brand} · ${p.category}</small><h3>${p.name}</h3>${detail}</div>
@@ -108,8 +127,7 @@ function paymentTemplate(p){
 }
 
 function pickupTemplate(p){
-  const primary = p.stockMode==='in_stock' ? 'Retiro mañana' : 'Retiro mañana a partir de las 17 hs';
-  return [primary,'Quiero coordinar'].map(name=>`<label class="choice pickup-choice">
+  return ['Retiro mañana','Quiero coordinar'].map(name=>`<label class="choice pickup-choice">
       <input type="radio" name="pickup" value="${name}" onchange="choosePickup(this)">
       <span class="radio-dot"></span><span class="choice-copy"><b>${name}</b><small>${name==='Quiero coordinar'?'Lo coordinamos por WhatsApp':'Reservá tu equipo y confirmamos el retiro'}</small></span>
     </label>`).join('');
@@ -140,12 +158,7 @@ function continueWhatsApp(){
   else if(selectedPayment==='Transferencia') paymentText += ` ${money(p.transfer)}`;
   else paymentText += ` de ${money(p.installments.amount)}`;
   const message = `Hola Mundo Móvil 👋\nQuiero reservar un ${p.name} ${p.memory} / ${p.ram} RAM - ${p.color}.\n\nForma de pago: ${paymentText}\nRetiro: ${selectedPickup}.`;
-  if(!WHATSAPP_NUMBER){
-    document.querySelector('#messagePreview').textContent = message;
-    document.querySelector('#messagePreviewWrap').hidden = false;
-    return;
-  }
-  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`,'_blank');
+  openWhatsApp(message);
 }
 
 function closeModal(){

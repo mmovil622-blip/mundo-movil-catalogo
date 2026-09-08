@@ -16,3 +16,7 @@ En `app.js`, completar `WHATSAPP_NUMBER` con el número real de Mundo Móvil, so
 
 ## Futuro
 La estructura está preparada para que después los datos vengan desde Google Sheets.
+
+
+## WhatsApp
+Número oficial configurado: +54 9 11 4414-8821. Los botones generales, ventas, servicio técnico y reserva del A17 abren WhatsApp con mensajes prearmados.
