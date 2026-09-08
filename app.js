@@ -50,6 +50,22 @@ function generalWhatsApp(){
   openWhatsApp('Hola Mundo Móvil 👋 Quiero hacer una consulta.');
 }
 
+function goToPhones(){
+  activeCategory = 'Teléfonos';
+  render();
+  document.querySelector('#catalogo').scrollIntoView({behavior:'smooth'});
+}
+
+function goToAccessories(){
+  activeCategory = 'Todos';
+  render();
+  document.querySelector('#catalogo').scrollIntoView({behavior:'smooth'});
+}
+
+function adviceWhatsApp(){
+  openWhatsApp('Hola Mundo Móvil 👋 Necesito asesoramiento. ¿Me pueden ayudar?');
+}
+
 function repairWhatsApp(){
   openWhatsApp('Hola Mundo Móvil 👋 Quiero consultar por una reparación.');
 }

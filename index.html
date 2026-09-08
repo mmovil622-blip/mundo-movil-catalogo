@@ -13,9 +13,24 @@
   <div class="header-actions"><a href="#catalogo">Ver catálogo</a><button class="header-whatsapp" onclick="generalWhatsApp()">WhatsApp</button></div>
 </header>
 <main>
-  <section class="hero">
-    <div><b>TODO PARA TU CELU EN UN SOLO LUGAR</b><h1>La tecnología,<br><em>a tu alcance.</em></h1><p>Celulares, accesorios y soluciones simples, sin vueltas. Consultá precios y opciones de pago.</p></div>
-    <aside><img src="assets/isotipo-azul.png" alt="Mundo Móvil"><small>SERVICIO TÉCNICO</small><h2>¿Tu celu necesita una mano?</h2><p>Reparaciones multimarca · iPhone · Android</p><button onclick="openServiceForm()">Cotizar reparación</button></aside>
+  <section class="digital-store">
+    <div class="digital-store-copy">
+      <b>MUNDO MÓVIL · TU LOCAL DIGITAL</b>
+      <h1>¿Qué necesitás <em>hoy?</em></h1>
+      <p>Elegí una opción y te guiamos rápido. Comprar, reparar o pedir asesoramiento, como si entraras al local.</p>
+    </div>
+    <div class="digital-store-grid">
+      <button class="digital-action repair-action express-action" onclick="openServiceForm()"><span class="action-icon">⚡</span><span><strong>Reparación Express en 1 hora</strong><small>Pantalla, batería, pin de carga y reparaciones rápidas</small></span><i>→</i></button>
+      <button class="digital-action primary-action" onclick="goToPhones()"><span class="action-icon">📱</span><span><strong>Quiero comprar un celular</strong><small>Equipos, financiación y asesoramiento</small></span><i>→</i></button>
+      <button class="digital-action diagnostic-action" onclick="openServiceForm()"><span class="action-icon">🛠️</span><span><strong>Tengo un problema con mi equipo</strong><small>No enciende, se mojó o no sabés qué tiene</small></span><i>→</i></button>
+      <button class="digital-action" onclick="goToAccessories()"><span class="action-icon">🎧</span><span><strong>Accesorios y tecnología</strong><small>Cargadores, auriculares, smartwatch, gaming y más</small></span><i>→</i></button>
+    </div>
+    <button class="advisor-wide" onclick="adviceWhatsApp()"><span>💬</span><span><strong>¿Necesitás ayuda para elegir?</strong><small>Hablá directamente con un asesor de Mundo Móvil</small></span><b>Hablar por WhatsApp →</b></button>
+    <div class="repair-highlight">
+      <div><b>SERVICIO TÉCNICO PROFESIONAL</b><h2>Reparamos tu equipo <em>en el día</em></h2><p>Módulos · Baterías · Glass · Pines de carga · Equipos que no encienden</p></div>
+      <button onclick="openServiceForm()">COTIZAR MI REPARACIÓN →</button>
+    </div>
+    <div class="digital-store-signoff"><img src="assets/isotipo-azul.png" alt="Mundo Móvil"><span><b>TODO PARA TU CELU EN UN SOLO LUGAR</b><small>La tecnología, a tu alcance.</small></span></div>
   </section>
 
   <section id="catalogo">
