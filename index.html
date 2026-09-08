@@ -33,6 +33,27 @@
     <div class="digital-store-signoff"><img src="assets/isotipo-azul.png" alt="Mundo Móvil"><span><b>TODO PARA TU CELU EN UN SOLO LUGAR</b><small>La tecnología, a tu alcance.</small></span></div>
   </section>
 
+  <section id="accessoriesHub" class="accessories-hub" hidden>
+    <div class="accessories-head">
+      <b>ACCESORIOS Y TECNOLOGÍA</b>
+      <h2>¿Qué estás buscando?</h2>
+      <p>Elegí una categoría y te mostramos opciones. Si no sabés cuál necesitás, te asesoramos por WhatsApp.</p>
+    </div>
+    <div class="accessories-category-grid">
+      <button onclick="accessoryCategory('Accesorios')"><span>🔌</span><strong>Cargadores y cables</strong><small>Carga, cables y conectividad</small></button>
+      <button onclick="accessoryCategory('Audio')"><span>🎧</span><strong>Auriculares</strong><small>Bluetooth, vincha y con cable</small></button>
+      <button onclick="accessoryCategory('Smartwatch')"><span>⌚</span><strong>Smartwatch</strong><small>Relojes y accesorios</small></button>
+      <button onclick="accessoryCategory('Audio')"><span>🔊</span><strong>Parlantes</strong><small>Audio portátil y Bluetooth</small></button>
+      <button onclick="accessoryCategory('Gaming')"><span>🎮</span><strong>Gaming</strong><small>Joysticks y accesorios</small></button>
+      <button onclick="accessoryCategory('Hogar')"><span>🏠</span><strong>Tecnología para el hogar</strong><small>Iluminación y productos útiles</small></button>
+      <button onclick="otherAccessoryWhatsApp()"><span>❓</span><strong>Busco otra cosa</strong><small>Contanos qué necesitás</small></button>
+    </div>
+    <div class="accessory-advisor">
+      <span>💬</span><div><strong>¿No sabés cuál elegir?</strong><small>Decinos qué equipo tenés o qué necesitás y te recomendamos una opción.</small></div>
+      <button onclick="accessoryAdviceWhatsApp()">QUIERO ASESORAMIENTO →</button>
+    </div>
+  </section>
+
   <section id="catalogo">
     <nav id="cats"></nav>
     <section class="filters"><input id="q" placeholder="Buscar producto, marca o modelo..."><select id="brand"><option value="">Todas las marcas</option></select></section>

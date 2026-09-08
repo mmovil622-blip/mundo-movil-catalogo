@@ -57,9 +57,25 @@ function goToPhones(){
 }
 
 function goToAccessories(){
-  activeCategory = 'Todos';
+  const hub = document.querySelector('#accessoriesHub');
+  hub.hidden = false;
+  hub.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function accessoryCategory(category){
+  activeCategory = category;
+  q.value = '';
+  brand.value = '';
   render();
   document.querySelector('#catalogo').scrollIntoView({behavior:'smooth'});
+}
+
+function accessoryAdviceWhatsApp(){
+  openWhatsApp('Hola Mundo Móvil 👋 Estoy buscando un accesorio pero no sé cuál elegir. ¿Me pueden asesorar?');
+}
+
+function otherAccessoryWhatsApp(){
+  openWhatsApp('Hola Mundo Móvil 👋 Estoy buscando un accesorio o producto de tecnología que no aparece en las categorías. Busco: ');
 }
 
 function adviceWhatsApp(){
