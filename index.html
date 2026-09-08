@@ -25,7 +25,7 @@
       <button class="digital-action diagnostic-action" onclick="openServiceForm()"><span class="action-icon">🛠️</span><span><strong>Tengo un problema con mi equipo</strong><small>No enciende, se mojó o no sabés qué tiene</small></span><i>→</i></button>
       <button class="digital-action" onclick="goToAccessories()"><span class="action-icon">🎧</span><span><strong>Accesorios y tecnología</strong><small>Cargadores, auriculares, smartwatch, gaming y más</small></span><i>→</i></button>
     </div>
-    <button class="advisor-wide" onclick="adviceWhatsApp()"><span>💬</span><span><strong>¿Necesitás ayuda para elegir?</strong><small>Hablá directamente con un asesor de Mundo Móvil</small></span><b>Hablar por WhatsApp →</b></button>
+    <button class="advisor-wide" onclick="openAdviceForm()"><span>💬</span><span><strong>¿Necesitás ayuda para elegir?</strong><small>Hablá directamente con un asesor de Mundo Móvil</small></span><b>Hablar por WhatsApp →</b></button>
     <div class="repair-highlight">
       <div><b>SERVICIO TÉCNICO PROFESIONAL</b><h2>Reparamos tu equipo <em>en el día</em></h2><p>Módulos · Baterías · Glass · Pines de carga · Equipos que no encienden</p></div>
       <button onclick="openServiceForm()">COTIZAR MI REPARACIÓN →</button>
@@ -172,5 +172,18 @@
 </div>
 
 <script src="app.js"></script>
+
+<div id="adviceModal" class="modal advice-modal" aria-hidden="true">
+  <div class="modal-panel advice-panel">
+    <button class="modal-close" onclick="closeAdviceForm()" aria-label="Cerrar">×</button>
+    <div class="advice-head"><b>ASESORAMIENTO PERSONALIZADO</b><h2>Te ayudamos a elegir</h2><p>Respondé 3 preguntas rápidas y un asesor de Mundo Móvil continúa con vos por WhatsApp.</p></div>
+    <div class="advice-question"><h3>1. ¿Qué estás buscando?</h3><div class="advice-options" id="adviceLooking"></div></div>
+    <div class="advice-question"><h3>2. ¿Qué presupuesto tenés aproximadamente?</h3><div class="advice-options" id="adviceBudget"></div></div>
+    <div class="advice-question"><h3>3. ¿Qué es lo más importante para vos?</h3><div class="advice-options" id="advicePriority"></div></div>
+    <div id="adviceError" class="form-error" hidden>Elegí una opción en cada pregunta para continuar.</div>
+    <button class="advice-send" onclick="sendAdviceWhatsApp()">HABLAR CON UN ASESOR →</button>
+  </div>
+</div>
+
 </body>
 </html>

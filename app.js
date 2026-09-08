@@ -78,9 +78,36 @@ function otherAccessoryWhatsApp(){
   openWhatsApp('Hola Mundo Móvil 👋 Estoy buscando un accesorio o producto de tecnología que no aparece en las categorías. Busco: ');
 }
 
-function adviceWhatsApp(){
-  openWhatsApp('Hola Mundo Móvil 👋 Necesito asesoramiento. ¿Me pueden ayudar?');
+const adviceState = { looking:'', budget:'', priority:'' };
+const adviceData = {
+  looking:[['📱','Un celular'],['🎧','Un accesorio'],['🎁','Un regalo'],['🔄','Quiero cambiar mi celular'],['❓','Otra cosa']],
+  budget:['Hasta $200.000','$200.000–$400.000','$400.000–$700.000','Más de $700.000','Prefiero no indicar'],
+  priority:[['📸','Cámara'],['🔋','Batería'],['🎮','Rendimiento'],['💾','Memoria'],['💰','Precio'],['🤷','No sé, quiero que me recomienden']]
+};
+function openAdviceForm(){
+  adviceState.looking=''; adviceState.budget=''; adviceState.priority='';
+  renderAdviceOptions();
+  document.querySelector('#adviceError').hidden=true;
+  document.querySelector('#adviceModal').classList.add('show');
+  document.body.classList.add('modal-open');
 }
+function closeAdviceForm(){
+  document.querySelector('#adviceModal').classList.remove('show');
+  document.body.classList.remove('modal-open');
+}
+function adviceOption(group,value){ adviceState[group]=value; renderAdviceOptions(); }
+function renderAdviceOptions(){
+  const make=(group,items)=>items.map(item=>{const icon=Array.isArray(item)?item[0]:'';const value=Array.isArray(item)?item[1]:item;return `<button class="${adviceState[group]===value?'selected':''}" onclick="adviceOption('${group}','${value.replace(/'/g,"\\'")}')">${icon?`<span>${icon}</span>`:''}<b>${value}</b></button>`}).join('');
+  document.querySelector('#adviceLooking').innerHTML=make('looking',adviceData.looking);
+  document.querySelector('#adviceBudget').innerHTML=make('budget',adviceData.budget);
+  document.querySelector('#advicePriority').innerHTML=make('priority',adviceData.priority);
+}
+function sendAdviceWhatsApp(){
+  if(!adviceState.looking || !adviceState.budget || !adviceState.priority){ document.querySelector('#adviceError').hidden=false; return; }
+  const message=`Hola Mundo Móvil 👋\nQuiero que me asesoren.\n\n🛍️ Busco: ${adviceState.looking}\n💰 Presupuesto: ${adviceState.budget}\n⭐ Lo más importante: ${adviceState.priority}\n\n¿Qué me recomiendan?`;
+  openWhatsApp(message);
+}
+function adviceWhatsApp(){ openAdviceForm(); }
 
 function repairWhatsApp(){
   openWhatsApp('Hola Mundo Móvil 👋 Quiero consultar por una reparación.');
