@@ -1,12 +1,12 @@
-# Mundo Móvil - Catálogo V4
+# Mundo Móvil · Catálogo V6
 
-Incluye catálogo de venta + WhatsApp oficial + nuevo formulario moderno de Servicio Técnico.
+Versión con nueva vista premium unificada para equipos iPhone y Multimarca.
 
-## Formulario de Servicio Técnico
-- 4 pasos: Equipo → Marca/Modelo → Problema → Resumen.
-- No muestra precios al cliente.
-- Envía toda la información al WhatsApp oficial de Mundo Móvil.
-- Incluye “No sé qué modelo es” y “Otro problema”.
-- Diseñado principalmente para celular.
+Cambios principales:
+- Fichas de teléfonos con foto, modelo, memoria/condición, efectivo, transferencia y 6 cuotas.
+- iPhone preparado para mostrar condición de batería.
+- Estado de disponibilidad/reserva.
+- Botón principal de reservar/consultar.
+- Mantiene el flujo aprobado de compra por WhatsApp y el resto del Local Digital V5.4.
 
-WhatsApp configurado: +54 9 11 4414-8821.
+Próximo paso: cargar fotos reales y conectar las planillas Google Sheets para que los datos salgan de la base.

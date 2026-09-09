@@ -17,8 +17,9 @@ const products = [
     image: 'assets/samsung-galaxy-a17-gris.png',
     featured: true
   },
-  { id:'samsung-a16', name:'Samsung Galaxy A16 128 GB', brand:'Samsung', category:'Teléfonos', cash:289999, emoji:'📱' },
-  { id:'moto-g15', name:'Motorola G15 128 GB', brand:'Motorola', category:'Teléfonos', cash:249999, emoji:'📱' },
+  { id:'iphone-13-pro-256', name:'iPhone 13 Pro', brand:'Apple', category:'Teléfonos', memory:'256 GB', condition:'Seminuevo', battery:'100%', cashUsd:460, cash:713310, transferUsd:497, transfer:770375, installments:{qty:6, amount:164347}, stockMode:'reserve', emoji:'📱', featured:true },
+  { id:'samsung-a16', name:'Samsung Galaxy A16', brand:'Samsung', category:'Teléfonos', memory:'128 GB', condition:'Nuevo', cash:289999, transfer:304499, installments:{qty:6, amount:64960}, stockMode:'reserve', emoji:'📱', featured:true },
+  { id:'moto-g15', name:'Motorola G15', brand:'Motorola', category:'Teléfonos', memory:'128 GB', condition:'Nuevo', cash:331500, transfer:348075, installments:{qty:6, amount:74256}, stockMode:'reserve', emoji:'📱', featured:true },
   { id:'watch-ultra', name:'Smartwatch Ultra 49 mm', brand:'Genérico', category:'Smartwatch', cash:59999, emoji:'⌚' },
   { id:'audio-bt', name:'Auriculares Bluetooth', brand:'Genérico', category:'Audio', cash:44999, emoji:'🎧' },
   { id:'joystick', name:'Joystick inalámbrico', brand:'Genérico', category:'Gaming', cash:54999, emoji:'🎮' },
@@ -144,12 +145,46 @@ function setCategory(x){ activeCategory=x; render(); }
 function cardTemplate(p){
   const visual = p.image
     ? `<img src="${p.image}" alt="${p.name}" loading="lazy">`
-    : `<span>${p.emoji || '📦'}</span>`;
+    : `<div class="phone-placeholder"><span>${p.emoji || '📱'}</span><small>Foto próximamente</small></div>`;
+
+  if(p.category === 'Teléfonos'){
+    const meta = [p.memory, p.condition].filter(Boolean).join(' · ');
+    const battery = p.brand === 'Apple'
+      ? `<div class="battery-switch"><span class="active">${p.battery || '100% batería'}</span><span class="disabled">Otra batería</span></div>`
+      : '';
+    const cashMain = p.cashUsd ? `<div class="premium-main-price">USD ${Math.round(p.cashUsd)}</div><div class="premium-ars">${money(p.cash)}</div>` : `<div class="premium-main-price">${money(p.cash)}</div>`;
+    const transfer = p.transfer
+      ? `<div class="premium-line"><span>Transferencia</span><strong>${p.transferUsd ? `USD ${Math.round(p.transferUsd)} · ` : ''}${money(p.transfer)}</strong></div>`
+      : '';
+    const cardTotal = p.installments ? p.installments.qty * p.installments.amount : 0;
+    const installments = p.installments
+      ? `<div class="premium-installments"><b>PROMO ${p.installments.qty} CUOTAS</b><small>Con tarjeta bancaria</small><strong>${p.installments.qty} × ${money(p.installments.amount)}</strong><span>Total ${money(cardTotal)}</span></div>`
+      : '';
+    const availability = p.stockMode === 'reserve'
+      ? `<span class="premium-stock reserve">● Disponible con reserva</span>`
+      : `<span class="premium-stock">● Disponible</span>`;
+
+    return `<article class="card premium-phone-card ${p.featured?'featured-card':''}">
+      <div class="pic premium-pic">${visual}<span class="photo-count">1 foto</span></div>
+      <div class="body premium-body">
+        <h3>${p.name}</h3>
+        <div class="premium-meta">${meta}</div>
+        ${battery}
+        ${cashMain}
+        <div class="premium-promo">PROMO EFECTIVO</div>
+        ${availability}
+        <div class="premium-details">${transfer}</div>
+        ${installments}
+        <button class="reserve-product" onclick="${p.image && p.installments && p.transfer ? `openProduct('${p.id}')` : `event.stopPropagation(); consultProduct('${p.id}')`}">${p.image && p.installments && p.transfer ? 'Reservar equipo' : 'Consultar equipo'}</button>
+      </div>
+    </article>`;
+  }
+
   const detail = p.featured
-    ? `<div class="card-meta">${p.memory} · ${p.ram} RAM · ${p.condition}</div>
+    ? `<div class="card-meta">${p.memory || ''}${p.ram ? ` · ${p.ram} RAM` : ''}${p.condition ? ` · ${p.condition}` : ''}</div>
        <div class="card-pay"><strong>${money(p.cash)}</strong><span>efectivo</span></div>
-       <div class="card-installments">o ${p.installments.qty} cuotas de <b>${money(p.installments.amount)}</b></div>
-       <button class="open-product" onclick="openProduct('${p.id}')">Ver opciones de compra</button>`
+       ${p.installments ? `<div class="card-installments">o ${p.installments.qty} cuotas de <b>${money(p.installments.amount)}</b></div>` : ''}
+       <button class="open-product" onclick="${p.image && p.installments && p.transfer ? `openProduct('${p.id}')` : `event.stopPropagation(); consultProduct('${p.id}')`}">Consultar</button>`
     : `<div class="price">${money(p.cash)}</div><button class="open-product generic-whatsapp" onclick="event.stopPropagation(); consultProduct('${p.id}')">Consultar por WhatsApp</button>`;
   return `<article class="card ${p.featured?'featured-card':''}">
       <div class="pic">${visual}</div>
@@ -162,10 +197,11 @@ function openProduct(id){
   if(!selectedProduct) return;
   selectedPayment = 'Efectivo';
   selectedPickup = '';
-  document.querySelector('#modalImage').src = selectedProduct.image;
+  const modalImg = document.querySelector('#modalImage');
+  if(selectedProduct.image){ modalImg.src = selectedProduct.image; modalImg.style.display='block'; } else { modalImg.removeAttribute('src'); modalImg.style.display='none'; }
   document.querySelector('#modalBrand').textContent = selectedProduct.brand;
   document.querySelector('#modalTitle').textContent = selectedProduct.name;
-  document.querySelector('#modalSpecs').textContent = `${selectedProduct.memory} · ${selectedProduct.ram} RAM · ${selectedProduct.condition} · ${selectedProduct.color}`;
+  document.querySelector('#modalSpecs').textContent = [selectedProduct.memory, selectedProduct.ram ? `${selectedProduct.ram} RAM` : '', selectedProduct.condition, selectedProduct.color, selectedProduct.battery ? `Batería ${selectedProduct.battery}` : ''].filter(Boolean).join(' · ');
   document.querySelector('#paymentOptions').innerHTML = paymentTemplate(selectedProduct);
   document.querySelector('#pickupOptions').innerHTML = pickupTemplate(selectedProduct);
   updateWhatsAppButton();
