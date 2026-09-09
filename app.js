@@ -1,25 +1,11 @@
 const WHATSAPP_NUMBER = '5491144148821'; // WhatsApp oficial de Mundo Móvil, sin + ni espacios.
 
-const products = [
-  {
-    id: 'samsung-a17-128-4-gris',
-    name: 'Samsung Galaxy A17',
-    brand: 'Samsung',
-    category: 'Teléfonos',
-    memory: '128 GB',
-    ram: '4 GB',
-    color: 'Gris',
-    condition: 'Nuevo',
-    cash: 380000,
-    transfer: 399000,
-    installments: { qty: 6, amount: 85000 },
-    stockMode: 'in_stock',
-    image: 'assets/samsung-galaxy-a17-gris.png',
-    featured: true
-  },
+const MULTIMARCA_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTnABsf1ojHDKS3RjRgXZ3uGMNdPzBWpCum-PCo823HbrP87Tas4q65f7hjEKuR4Q/pub?gid=1466612739&single=true&output=csv';
+
+// Productos que todavía no salen de Google Sheets.
+// Multimarca se agrega automáticamente desde la hoja WEB publicada.
+const staticProducts = [
   { id:'iphone-13-pro-256', name:'iPhone 13 Pro', brand:'Apple', category:'Teléfonos', memory:'256 GB', condition:'Seminuevo', battery:'100%', cashUsd:460, cash:713310, transferUsd:497, transfer:770375, installments:{qty:6, amount:164347}, stockMode:'reserve', emoji:'📱', featured:true },
-  { id:'samsung-a16', name:'Samsung Galaxy A16', brand:'Samsung', category:'Teléfonos', memory:'128 GB', condition:'Nuevo', cash:289999, transfer:304499, installments:{qty:6, amount:64960}, stockMode:'reserve', emoji:'📱', featured:true },
-  { id:'moto-g15', name:'Motorola G15', brand:'Motorola', category:'Teléfonos', memory:'128 GB', condition:'Nuevo', cash:331500, transfer:348075, installments:{qty:6, amount:74256}, stockMode:'reserve', emoji:'📱', featured:true },
   { id:'watch-ultra', name:'Smartwatch Ultra 49 mm', brand:'Genérico', category:'Smartwatch', cash:59999, emoji:'⌚' },
   { id:'audio-bt', name:'Auriculares Bluetooth', brand:'Genérico', category:'Audio', cash:44999, emoji:'🎧' },
   { id:'joystick', name:'Joystick inalámbrico', brand:'Genérico', category:'Gaming', cash:54999, emoji:'🎮' },
@@ -27,6 +13,10 @@ const products = [
   { id:'parlante', name:'Parlante Bluetooth', brand:'Genérico', category:'Audio', cash:79999, emoji:'🔊' },
   { id:'proyector', name:'Proyector astronauta', brand:'Genérico', category:'Hogar', cash:49999, emoji:'🚀' }
 ];
+
+let multimarcaProducts = [];
+let products = [...staticProducts];
+let catalogLoadState = 'loading';
 
 let activeCategory = 'Todos';
 let selectedProduct = null;
@@ -39,8 +29,6 @@ const q = document.querySelector('#q');
 const brand = document.querySelector('#brand');
 const modal = document.querySelector('#productModal');
 
-const categories = ['Todos', ...new Set(products.map(p => p.category))];
-[...new Set(products.map(p => p.brand))].forEach(x => brand.innerHTML += `<option>${x}</option>`);
 
 
 function openWhatsApp(message){
@@ -128,7 +116,15 @@ function productSearchText(p){
   return [p.name,p.brand,p.category,p.memory,p.ram,p.color,p.condition].filter(Boolean).join(' ').toLowerCase();
 }
 
+function refreshBrandFilter(){
+  const selected = brand.value;
+  const brands = [...new Set(products.map(p => p.brand).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+  brand.innerHTML = '<option value="">Todas las marcas</option>' + brands.map(x => `<option>${x}</option>`).join('');
+  if(brands.includes(selected)) brand.value = selected;
+}
+
 function render(){
+  const categories = ['Todos', ...new Set(products.map(p => p.category))];
   nav.innerHTML = categories.map(x => `<button class="${x===activeCategory?'on':''}" onclick="setCategory('${x}')">${x}</button>`).join('');
   const term = q.value.trim().toLowerCase();
   const visible = products.filter(p =>
@@ -136,7 +132,9 @@ function render(){
     (!brand.value || p.brand===brand.value) &&
     (!term || productSearchText(p).includes(term))
   );
-  document.querySelector('#count').textContent = `${visible.length} productos`;
+  const phoneView = activeCategory === 'Teléfonos' || activeCategory === 'Todos';
+  const status = catalogLoadState === 'loading' && phoneView ? ' · actualizando Multimarca…' : '';
+  document.querySelector('#count').textContent = `${visible.length} productos${status}`;
   grid.innerHTML = visible.map(cardTemplate).join('');
 }
 
@@ -175,7 +173,7 @@ function cardTemplate(p){
         ${availability}
         <div class="premium-details">${transfer}</div>
         ${installments}
-        <button class="reserve-product" onclick="${p.image && p.installments && p.transfer ? `openProduct('${p.id}')` : `event.stopPropagation(); consultProduct('${p.id}')`}">${p.image && p.installments && p.transfer ? 'Reservar equipo' : 'Consultar equipo'}</button>
+        <button class="reserve-product" onclick="${p.installments && p.transfer ? `openProduct('${p.id}')` : `event.stopPropagation(); consultProduct('${p.id}')`}">${p.installments && p.transfer ? 'Reservar equipo' : 'Consultar equipo'}</button>
       </div>
     </article>`;
   }
@@ -184,7 +182,7 @@ function cardTemplate(p){
     ? `<div class="card-meta">${p.memory || ''}${p.ram ? ` · ${p.ram} RAM` : ''}${p.condition ? ` · ${p.condition}` : ''}</div>
        <div class="card-pay"><strong>${money(p.cash)}</strong><span>efectivo</span></div>
        ${p.installments ? `<div class="card-installments">o ${p.installments.qty} cuotas de <b>${money(p.installments.amount)}</b></div>` : ''}
-       <button class="open-product" onclick="${p.image && p.installments && p.transfer ? `openProduct('${p.id}')` : `event.stopPropagation(); consultProduct('${p.id}')`}">Consultar</button>`
+       <button class="open-product" onclick="${p.installments && p.transfer ? `openProduct('${p.id}')` : `event.stopPropagation(); consultProduct('${p.id}')`}">Consultar</button>`
     : `<div class="price">${money(p.cash)}</div><button class="open-product generic-whatsapp" onclick="event.stopPropagation(); consultProduct('${p.id}')">Consultar por WhatsApp</button>`;
   return `<article class="card ${p.featured?'featured-card':''}">
       <div class="pic">${visual}</div>
@@ -252,7 +250,8 @@ function continueWhatsApp(){
   if(selectedPayment==='Efectivo') paymentText += ` ${money(p.cash)}`;
   else if(selectedPayment==='Transferencia') paymentText += ` ${money(p.transfer)}`;
   else paymentText += ` de ${money(p.installments.amount)}`;
-  const message = `Hola Mundo Móvil 👋\nQuiero reservar un ${p.name} ${p.memory} / ${p.ram} RAM - ${p.color}.\n\nForma de pago: ${paymentText}\nRetiro: ${selectedPickup}.`;
+  const specs = [p.memory, p.ram ? `${p.ram} RAM` : '', p.color].filter(Boolean).join(' · ');
+  const message = `Hola Mundo Móvil 👋\nQuiero reservar un ${p.name}${specs ? ` · ${specs}` : ''}.\n\nForma de pago: ${paymentText}\nRetiro: ${selectedPickup}.`;
   openWhatsApp(message);
 }
 
@@ -262,10 +261,132 @@ function closeModal(){
   document.body.classList.remove('modal-open');
 }
 
+
+function parseCSV(text){
+  const rows=[];
+  let row=[], field='', quoted=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(quoted){
+      if(ch==='"' && text[i+1]==='"'){ field+='"'; i++; }
+      else if(ch==='"'){ quoted=false; }
+      else field+=ch;
+    }else{
+      if(ch==='"') quoted=true;
+      else if(ch===','){ row.push(field); field=''; }
+      else if(ch==='\n'){ row.push(field.replace(/\r$/,'')); rows.push(row); row=[]; field=''; }
+      else field+=ch;
+    }
+  }
+  if(field.length || row.length){ row.push(field.replace(/\r$/,'')); rows.push(row); }
+  return rows;
+}
+
+function normalizeHeader(value){
+  return String(value || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+}
+
+function parseMoney(value){
+  if(value == null || value === '') return 0;
+  let clean=String(value).trim().replace(/[$\s]/g,'');
+  // Las planillas argentinas pueden entregar 299.000, 299,000 o 299000.
+  if(/^\d{1,3}([.,]\d{3})+$/.test(clean)) clean=clean.replace(/[.,]/g,'');
+  else clean=clean.replace(/\./g,'').replace(',','.');
+  const n=Number(clean.replace(/[^0-9.-]/g,''));
+  return Number.isFinite(n) ? n : 0;
+}
+
+function parseIntSafe(value, fallback=0){
+  const n=parseInt(String(value ?? '').replace(/[^0-9-]/g,''),10);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function directImageUrl(url){
+  if(!url) return '';
+  const value=String(url).trim();
+  const drive=value.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+  if(drive) return `https://drive.google.com/uc?export=view&id=${drive[1]}`;
+  return value;
+}
+
+function sheetRowsToProducts(csvText){
+  const rows=parseCSV(csvText).filter(r=>r.some(c=>String(c).trim()!==''));
+  if(rows.length<2) return [];
+  const headers=rows[0].map(normalizeHeader);
+  const idx=(name)=>headers.indexOf(normalizeHeader(name));
+  const get=(r,name)=>{ const i=idx(name); return i>=0 ? (r[i] ?? '') : ''; };
+
+  return rows.slice(1).map((r,n)=>{
+    const active=String(get(r,'Activo')).trim().toLowerCase();
+    if(active && !['si','sí','yes','true','1'].includes(active)) return null;
+    const brandName=String(get(r,'Marca')).trim();
+    const model=String(get(r,'Modelo')).trim();
+    if(!model) return null;
+    const memory=String(get(r,'Memoria')).trim();
+    const ram=String(get(r,'RAM')).trim();
+    const red=String(get(r,'Red')).trim();
+    const cash=parseMoney(get(r,'Efectivo'));
+    const transfer=parseMoney(get(r,'Transferencia'));
+    const cardTotal=parseMoney(get(r,'Total tarjeta'));
+    const qty=parseIntSafe(get(r,'Cuotas'),6) || 6;
+    let installment=parseMoney(get(r,'Valor cuota'));
+    if(!installment && cardTotal && qty) installment=Math.round(cardTotal/qty);
+    const color=String(get(r,'Color')).trim();
+    const state=String(get(r,'Estado')).trim() || 'Nuevo';
+    const image=directImageUrl(get(r,'Foto / URL'));
+    const safeId=`sheet-${brandName}-${model}-${memory}-${n}`.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    return {
+      id:safeId,
+      name:[brandName,model].filter(Boolean).join(' '),
+      brand:brandName || 'Multimarca',
+      category:'Teléfonos',
+      network:red,
+      memory,
+      ram,
+      color,
+      condition:state,
+      cash,
+      transfer,
+      installments: installment ? {qty, amount:installment} : null,
+      cardTotal,
+      stockMode:'reserve',
+      image,
+      emoji:'📱',
+      featured:true,
+      source:'google-sheets'
+    };
+  }).filter(Boolean).filter(p=>p.cash>0);
+}
+
+async function loadMultimarcaFromSheets(){
+  catalogLoadState='loading';
+  render();
+  try{
+    const response=await fetch(`${MULTIMARCA_CSV_URL}&ts=${Date.now()}`, {cache:'no-store'});
+    if(!response.ok) throw new Error(`HTTP ${response.status}`);
+    const text=await response.text();
+    const loaded=sheetRowsToProducts(text);
+    if(!loaded.length) throw new Error('La hoja no devolvió equipos activos');
+    multimarcaProducts=loaded;
+    products=[...staticProducts,...multimarcaProducts];
+    catalogLoadState='ready';
+    refreshBrandFilter();
+    render();
+    console.info(`Mundo Móvil: ${loaded.length} equipos Multimarca cargados desde Google Sheets.`);
+  }catch(error){
+    catalogLoadState='error';
+    refreshBrandFilter();
+    render();
+    console.error('No se pudo cargar Multimarca desde Google Sheets:',error);
+  }
+}
+
 q.oninput = brand.oninput = render;
 modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+refreshBrandFilter();
 render();
+loadMultimarcaFromSheets();
 
 // ===== Formulario universal de Servicio Técnico =====
 const serviceState = { step:1, name:'', device:'', brand:'', model:'', unknownModel:false, issue:'', details:'' };
