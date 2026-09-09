@@ -1,16 +1,15 @@
-# Mundo Móvil · Catálogo V6.1
+# Mundo Móvil · Catálogo V6.2
 
-Versión premium con Multimarca conectado a Google Sheets.
+Versión premium con **Multimarca + iPhone conectados a Google Sheets**.
 
 ## Qué cambia
-- La vista premium se mantiene para todos los teléfonos.
-- Equipos Multimarca se leen automáticamente desde la hoja pública `wep` en CSV.
-- Solo se cargan filas con `Activo = Sí`.
-- La web usa: Marca, Modelo, Red, RAM, Memoria, Efectivo, Transferencia, Total tarjeta, Cuotas, Valor cuota, Color, Estado y Foto / URL.
-- El costo y los campos internos no se exponen en el catálogo.
-- Los cambios de precios/datos en Google Sheets se reflejan al volver a cargar la web.
-- Si Foto / URL está vacía, se muestra “Foto próximamente”.
-- iPhone sigue temporalmente con el ejemplo actual; la conexión de la hoja iPhone es el próximo paso.
+- Multimarca sigue leyendo la hoja pública `wep`.
+- iPhone ahora lee la hoja pública `WEB iPhone`.
+- Solo aparecen filas con `Activo = Sí` y precio de efectivo válido.
+- iPhone toma: Modelo, Memoria, Condición batería, Efectivo USD/ARS, Transferencia USD/ARS, Total tarjeta ARS, Cuotas, Valor cuota ARS, Color, Estado y Foto / URL.
+- Se eliminó el iPhone de ejemplo estático para evitar duplicados.
+- Los cambios en Google Sheets se reflejan al recargar la web.
 
 ## Publicación
-Subir el contenido de esta carpeta a la raíz del repositorio GitHub Pages, reemplazando los archivos anteriores.
+Reemplazar en GitHub **index.html, app.js, styles.css y README.md** por los de esta versión.
+**No borrar la carpeta `assets`**: ahí están logos y fotos Multimarca ya cargadas.

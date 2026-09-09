@@ -1,11 +1,11 @@
 const WHATSAPP_NUMBER = '5491144148821'; // WhatsApp oficial de Mundo Móvil, sin + ni espacios.
 
 const MULTIMARCA_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTnABsf1ojHDKS3RjRgXZ3uGMNdPzBWpCum-PCo823HbrP87Tas4q65f7hjEKuR4Q/pub?gid=1466612739&single=true&output=csv';
+const IPHONE_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR6wq47V7MeQdnW3p58Z9ESVPsEKNmxnaNCu0-fHIKu000O3b4mCdSTPbQQqokQ7Q/pub?gid=2025481075&single=true&output=csv';
 
-// Productos que todavía no salen de Google Sheets.
-// Multimarca se agrega automáticamente desde la hoja WEB publicada.
+// Accesorios todavía cargados de forma estática.
+// Multimarca e iPhone se agregan automáticamente desde Google Sheets.
 const staticProducts = [
-  { id:'iphone-13-pro-256', name:'iPhone 13 Pro', brand:'Apple', category:'Teléfonos', memory:'256 GB', condition:'Seminuevo', battery:'100%', cashUsd:460, cash:713310, transferUsd:497, transfer:770375, installments:{qty:6, amount:164347}, stockMode:'reserve', emoji:'📱', featured:true },
   { id:'watch-ultra', name:'Smartwatch Ultra 49 mm', brand:'Genérico', category:'Smartwatch', cash:59999, emoji:'⌚' },
   { id:'audio-bt', name:'Auriculares Bluetooth', brand:'Genérico', category:'Audio', cash:44999, emoji:'🎧' },
   { id:'joystick', name:'Joystick inalámbrico', brand:'Genérico', category:'Gaming', cash:54999, emoji:'🎮' },
@@ -15,6 +15,7 @@ const staticProducts = [
 ];
 
 let multimarcaProducts = [];
+let iphoneProducts = [];
 let products = [...staticProducts];
 let catalogLoadState = 'loading';
 
@@ -368,7 +369,7 @@ async function loadMultimarcaFromSheets(){
     const loaded=sheetRowsToProducts(text);
     if(!loaded.length) throw new Error('La hoja no devolvió equipos activos');
     multimarcaProducts=loaded;
-    products=[...staticProducts,...multimarcaProducts];
+    products=[...staticProducts,...iphoneProducts,...multimarcaProducts];
     catalogLoadState='ready';
     refreshBrandFilter();
     render();
@@ -381,12 +382,81 @@ async function loadMultimarcaFromSheets(){
   }
 }
 
+
+function iPhoneRowsToProducts(csvText){
+  const rows=parseCSV(csvText).filter(r=>r.some(c=>String(c).trim()!==''));
+  if(rows.length<2) return [];
+  const headers=rows[0].map(normalizeHeader);
+  const idx=(name)=>headers.indexOf(normalizeHeader(name));
+  const get=(r,name)=>{ const i=idx(name); return i>=0 ? (r[i] ?? '') : ''; };
+
+  return rows.slice(1).map((r,n)=>{
+    const active=String(get(r,'Activo')).trim().toLowerCase();
+    if(active && !['si','sí','yes','true','1'].includes(active)) return null;
+    const model=String(get(r,'Modelo')).trim();
+    if(!model) return null;
+    const memory=String(get(r,'Memoria')).trim();
+    const battery=String(get(r,'Condición batería')).trim();
+    const cashUsd=parseMoney(get(r,'Efectivo USD'));
+    const cash=parseMoney(get(r,'Efectivo ARS'));
+    const transferUsd=parseMoney(get(r,'Transferencia USD'));
+    const transfer=parseMoney(get(r,'Transferencia ARS'));
+    const cardTotal=parseMoney(get(r,'Total tarjeta ARS'));
+    const qty=parseIntSafe(get(r,'Cuotas'),6) || 6;
+    let installment=parseMoney(get(r,'Valor cuota ARS'));
+    if(!installment && cardTotal && qty) installment=Math.round(cardTotal/qty);
+    const color=String(get(r,'Color')).trim();
+    const state=String(get(r,'Estado')).trim() || 'Usado / Grado A';
+    const image=directImageUrl(get(r,'Foto / URL'));
+    const safeId=`iphone-${model}-${memory}-${battery}-${n}`.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    return {
+      id:safeId,
+      name:model,
+      brand:'Apple',
+      category:'Teléfonos',
+      memory,
+      battery,
+      color,
+      condition:state,
+      cashUsd,
+      cash,
+      transferUsd,
+      transfer,
+      installments: installment ? {qty, amount:installment} : null,
+      cardTotal,
+      stockMode:'reserve',
+      image,
+      emoji:'📱',
+      featured:true,
+      source:'google-sheets-iphone'
+    };
+  }).filter(Boolean).filter(p=>p.cash>0);
+}
+
+async function loadIPhoneFromSheets(){
+  try{
+    const response=await fetch(`${IPHONE_CSV_URL}&ts=${Date.now()}`, {cache:'no-store'});
+    if(!response.ok) throw new Error(`HTTP ${response.status}`);
+    const text=await response.text();
+    const loaded=iPhoneRowsToProducts(text);
+    if(!loaded.length) throw new Error('La hoja WEB iPhone no devolvió equipos activos con precio');
+    iphoneProducts=loaded;
+    products=[...staticProducts,...iphoneProducts,...multimarcaProducts];
+    refreshBrandFilter();
+    render();
+    console.info(`Mundo Móvil: ${loaded.length} iPhone cargados desde Google Sheets.`);
+  }catch(error){
+    console.error('No se pudo cargar iPhone desde Google Sheets:',error);
+  }
+}
+
 q.oninput = brand.oninput = render;
 modal.addEventListener('click',e=>{ if(e.target===modal) closeModal(); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
 refreshBrandFilter();
 render();
 loadMultimarcaFromSheets();
+loadIPhoneFromSheets();
 
 // ===== Formulario universal de Servicio Técnico =====
 const serviceState = { step:1, name:'', device:'', brand:'', model:'', unknownModel:false, issue:'', details:'' };
