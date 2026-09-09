@@ -1,15 +1,19 @@
-# Mundo Móvil · Catálogo V6.2
+# Mundo Móvil · Catálogo V6.3
 
 Versión premium con **Multimarca + iPhone conectados a Google Sheets**.
 
-## Qué cambia
-- Multimarca sigue leyendo la hoja pública `wep`.
-- iPhone ahora lee la hoja pública `WEB iPhone`.
-- Solo aparecen filas con `Activo = Sí` y precio de efectivo válido.
-- iPhone toma: Modelo, Memoria, Condición batería, Efectivo USD/ARS, Transferencia USD/ARS, Total tarjeta ARS, Cuotas, Valor cuota ARS, Color, Estado y Foto / URL.
-- Se eliminó el iPhone de ejemplo estático para evitar duplicados.
-- Los cambios en Google Sheets se reflejan al recargar la web.
+## Cambios de V6.3
+- Corrige la lectura de precios USD de iPhone: ya no concatena los decimales (por ejemplo, `611.24` deja de verse como `61124`).
+- Los valores USD se muestran redondeados y limpios: `USD 611`.
+- La ficha de equipos ahora separa claramente:
+  - **Promo efectivo**
+  - **Transferencia**
+  - **Precio de lista**
+  - **Promo 6 cuotas sin interés**, calculada sobre el precio de lista.
+- En iPhone, el precio de lista también muestra una referencia equivalente en USD cuando puede derivarse de la cotización usada en la planilla.
+- Se mantienen las conexiones automáticas a las hojas públicas de Multimarca e iPhone y el filtro `Activo = Sí`.
 
 ## Publicación
 Reemplazar en GitHub **index.html, app.js, styles.css y README.md** por los de esta versión.
-**No borrar la carpeta `assets`**: ahí están logos y fotos Multimarca ya cargadas.
+
+**No borrar la carpeta `assets`**: ahí están logos y fotos ya cargadas.

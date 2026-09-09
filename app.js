@@ -113,6 +113,11 @@ function money(x){
   return new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(x);
 }
 
+function usdMoney(x){
+  if(!Number.isFinite(Number(x)) || Number(x) <= 0) return '';
+  return `USD ${new Intl.NumberFormat('es-AR',{maximumFractionDigits:0}).format(Math.round(Number(x)))}`;
+}
+
 function productSearchText(p){
   return [p.name,p.brand,p.category,p.memory,p.ram,p.color,p.condition].filter(Boolean).join(' ').toLowerCase();
 }
@@ -151,13 +156,16 @@ function cardTemplate(p){
     const battery = p.brand === 'Apple'
       ? `<div class="battery-switch"><span class="active">${p.battery || '100% batería'}</span><span class="disabled">Otra batería</span></div>`
       : '';
-    const cashMain = p.cashUsd ? `<div class="premium-main-price">USD ${Math.round(p.cashUsd)}</div><div class="premium-ars">${money(p.cash)}</div>` : `<div class="premium-main-price">${money(p.cash)}</div>`;
+    const cashMain = p.cashUsd ? `<div class="premium-main-price">${usdMoney(p.cashUsd)}</div><div class="premium-ars">${money(p.cash)}</div>` : `<div class="premium-main-price">${money(p.cash)}</div>`;
     const transfer = p.transfer
-      ? `<div class="premium-line"><span>Transferencia</span><strong>${p.transferUsd ? `USD ${Math.round(p.transferUsd)} · ` : ''}${money(p.transfer)}</strong></div>`
+      ? `<div class="premium-line"><span>Transferencia</span><strong>${p.transferUsd ? `${usdMoney(p.transferUsd)} · ` : ''}${money(p.transfer)}</strong></div>`
       : '';
-    const cardTotal = p.installments ? p.installments.qty * p.installments.amount : 0;
+    const cardTotal = p.cardTotal || (p.installments ? p.installments.qty * p.installments.amount : 0);
+    const listPrice = cardTotal
+      ? `<div class="premium-line premium-list-price"><span>Precio de lista</span><strong>${p.cardTotalUsd ? `${usdMoney(p.cardTotalUsd)} · ` : ''}${money(cardTotal)}</strong></div>`
+      : '';
     const installments = p.installments
-      ? `<div class="premium-installments"><b>PROMO ${p.installments.qty} CUOTAS</b><small>Con tarjeta bancaria</small><strong>${p.installments.qty} × ${money(p.installments.amount)}</strong><span>Total ${money(cardTotal)}</span></div>`
+      ? `<div class="premium-installments"><b>PROMO ${p.installments.qty} CUOTAS SIN INTERÉS</b><small>Precio de lista en hasta ${p.installments.qty} cuotas sin interés</small><strong>${p.installments.qty} × ${money(p.installments.amount)}</strong><span>Total precio de lista ${money(cardTotal)}</span></div>`
       : '';
     const availability = p.stockMode === 'reserve'
       ? `<span class="premium-stock reserve">● Disponible con reserva</span>`
@@ -172,7 +180,7 @@ function cardTemplate(p){
         ${cashMain}
         <div class="premium-promo">PROMO EFECTIVO</div>
         ${availability}
-        <div class="premium-details">${transfer}</div>
+        <div class="premium-details">${transfer}${listPrice}</div>
         ${installments}
         <button class="reserve-product" onclick="${p.installments && p.transfer ? `openProduct('${p.id}')` : `event.stopPropagation(); consultProduct('${p.id}')`}">${p.installments && p.transfer ? 'Reservar equipo' : 'Consultar equipo'}</button>
       </div>
@@ -297,6 +305,28 @@ function parseMoney(value){
   return Number.isFinite(n) ? n : 0;
 }
 
+function parseUsd(value){
+  if(value == null || value === '') return 0;
+  let clean=String(value).trim().replace(/[$\s]/g,'').replace(/[^0-9.,-]/g,'');
+  if(!clean) return 0;
+  const lastDot=clean.lastIndexOf('.');
+  const lastComma=clean.lastIndexOf(',');
+  if(lastDot >= 0 && lastComma >= 0){
+    const decimalSep = lastDot > lastComma ? '.' : ',';
+    const thousandsSep = decimalSep === '.' ? ',' : '.';
+    clean = clean.split(thousandsSep).join('');
+    if(decimalSep === ',') clean = clean.replace(',','.');
+  }else if(lastComma >= 0){
+    const decimals=clean.length-lastComma-1;
+    clean = decimals <= 2 ? clean.replace(',','.') : clean.replace(/,/g,'');
+  }else if(lastDot >= 0){
+    const decimals=clean.length-lastDot-1;
+    if(decimals > 2) clean=clean.replace(/\./g,'');
+  }
+  const n=Number(clean);
+  return Number.isFinite(n) ? n : 0;
+}
+
 function parseIntSafe(value, fallback=0){
   const n=parseInt(String(value ?? '').replace(/[^0-9-]/g,''),10);
   return Number.isFinite(n) ? n : fallback;
@@ -397,14 +427,17 @@ function iPhoneRowsToProducts(csvText){
     if(!model) return null;
     const memory=String(get(r,'Memoria')).trim();
     const battery=String(get(r,'Condición batería')).trim();
-    const cashUsd=parseMoney(get(r,'Efectivo USD'));
+    const cashUsd=parseUsd(get(r,'Efectivo USD'));
     const cash=parseMoney(get(r,'Efectivo ARS'));
-    const transferUsd=parseMoney(get(r,'Transferencia USD'));
+    const transferUsd=parseUsd(get(r,'Transferencia USD'));
     const transfer=parseMoney(get(r,'Transferencia ARS'));
     const cardTotal=parseMoney(get(r,'Total tarjeta ARS'));
     const qty=parseIntSafe(get(r,'Cuotas'),6) || 6;
     let installment=parseMoney(get(r,'Valor cuota ARS'));
     if(!installment && cardTotal && qty) installment=Math.round(cardTotal/qty);
+    const exchangeRate = cashUsd && cash ? cash / cashUsd : 0;
+    const cardTotalUsd = exchangeRate && cardTotal ? cardTotal / exchangeRate : 0;
+    const installmentUsd = exchangeRate && installment ? installment / exchangeRate : 0;
     const color=String(get(r,'Color')).trim();
     const state=String(get(r,'Estado')).trim() || 'Usado / Grado A';
     const image=directImageUrl(get(r,'Foto / URL'));
@@ -424,6 +457,8 @@ function iPhoneRowsToProducts(csvText){
       transfer,
       installments: installment ? {qty, amount:installment} : null,
       cardTotal,
+      cardTotalUsd,
+      installmentUsd,
       stockMode:'reserve',
       image,
       emoji:'📱',
