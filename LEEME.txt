@@ -1,0 +1,12 @@
+MUNDO MÓVIL · V6.4 · CABLES Y CARGADORES
+
+Subir a la RAÍZ del repositorio GitHub:
+1) index.html        -> reemplaza el index.html existente
+2) cables-cargadores.js -> archivo nuevo
+
+NO reemplazar app.js.
+NO reemplazar styles.css.
+NO tocar assets.
+
+La nueva conexión usa el CSV público de la hoja Cables y Cargadores.
+Solo se muestran filas con Activo = Sí.
