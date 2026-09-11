@@ -92,7 +92,7 @@ function ccRowsToProducts(csvText){
       transfer,
       cardTotal:listPrice,
       installments: installment ? {qty, amount:installment} : null,
-      stockMode:'reserve',
+      stockMode:'stock',
       image,
       emoji:'🔌',
       featured:true,
@@ -125,7 +125,7 @@ function ccAccessoryCard(p){
       <div class="premium-meta">${meta}</div>
       <div class="premium-main-price">${money(p.cash)}</div>
       <div class="premium-promo">PROMO EFECTIVO</div>
-      <span class="premium-stock reserve">● Disponible con reserva</span>
+      <span class="premium-stock">● En stock</span>
       <div class="premium-details">${transfer}${list}</div>
       ${installments}
       <button class="reserve-product" onclick="${p.installments && p.transfer ? `openProduct('${p.id}')` : `event.stopPropagation(); consultProduct('${p.id}')`}">Reservar producto</button>
