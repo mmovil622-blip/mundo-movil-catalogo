@@ -134,10 +134,11 @@ function render(){
   nav.innerHTML = categories.map(x => `<button class="${x===activeCategory?'on':''}" onclick="setCategory('${x}')">${x}</button>`).join('');
   const term = q.value.trim().toLowerCase();
   const visible = products.filter(p =>
-    (activeCategory==='Todos' || p.category===activeCategory) &&
-    (!brand.value || p.brand===brand.value) &&
-    (!term || productSearchText(p).includes(term))
-  );
+  ['Teléfonos', 'Accesorios'].includes(p.category) &&
+  (activeCategory==='Todos' || p.category===activeCategory) &&
+  (!brand.value || p.brand===brand.value) &&
+  (!term || productSearchText(p).includes(term))
+);
   const phoneView = activeCategory === 'Teléfonos' || activeCategory === 'Todos';
   const status = catalogLoadState === 'loading' && phoneView ? ' · actualizando Multimarca…' : '';
   document.querySelector('#count').textContent = `${visible.length} productos${status}`;
