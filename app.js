@@ -130,7 +130,7 @@ function refreshBrandFilter(){
 }
 
 function render(){
-  const categories = ['Todos', ...new Set(products.map(p => p.category))];
+  const categories = ['Todos', 'Teléfonos', 'Accesorios'];
   nav.innerHTML = categories.map(x => `<button class="${x===activeCategory?'on':''}" onclick="setCategory('${x}')">${x}</button>`).join('');
   const term = q.value.trim().toLowerCase();
   const visible = products.filter(p =>
